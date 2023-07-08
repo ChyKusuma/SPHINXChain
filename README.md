@@ -7,9 +7,9 @@ This project is dedicated to the world community as an Open-source Post-quantum 
 This repository contains code for the SPHINXChain project, which is a mining module for the SPHINX blockchain frameeowk. The SPHINXChain aims to provide a "Chain" in the blockchain systems
 
 
-## Components
+# Components
 
-## SPHINX_Chain Namespace
+### SPHINX_Chain Namespace
 
 This code represents the implementation of the `SPHINX_Chain` namespace, which includes the `Chain` class responsible for managing the blockchain. Let's break down the important components and their functions:
 
