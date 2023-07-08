@@ -7,7 +7,7 @@ This project is dedicated to the world community as an Open-source Post-quantum 
 This repository contains code for the SPHINXChain project, which is a mining module for the SPHINX blockchain frameeowk. The SPHINXChain aims to provide a "Chain" in the blockchain systems
 
 
-# Components
+## Components
 
 ### SPHINX_Chain Namespace
 
@@ -41,7 +41,7 @@ As the project progresses, further updates and enhancements will be made to ensu
 
 We appreciate your understanding and look forward to collaborative efforts in shaping the future of the SPHINX blockchain project.
 
-# Getting Started
+## Getting Started
 To get started with the SPHINX blockchain project, follow the instructions below:
 
 1. Clone the repository: `git clone https://github.com/ChyKusuma/SPHINXChain.git`
