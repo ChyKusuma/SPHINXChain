@@ -33,7 +33,7 @@ This code represents the implementation of the `SPHINX_Chain` namespace, which i
 
 These components work together to provide functionality for initializing, modifying, validating, and visualizing the blockchain, as well as serializing and deserializing it from/to JSON format.
 
-### This repository is part of the  [SPHINXPoW](https://github.com/SPHINX-HUB-ORG/SPHINXPoW) [SPHINXMiner](https://github.com/SPHINX-HUB-ORG/SPHINXMINER)
+### This repository is part of the  [SPHINXPoW](https://github.com/SPHINX-HUB-ORG/SPHINXPoW) [SPHINXMiner](https://github.com/SPHINX-HUB-ORG/SPHINXMINER) [SPHINXMiner](https://github.com/SPHINX-HUB-ORG/SPHINXBLOCK)
 
 Please note that the code in this repository is a part of the SPHINX blockchain algorithm, which is currently in development and not fully integrated or extensively tested for functionality. The purpose of this repository is to provide a framework and algorithm for the mining scheme in the SPHINX blockchain project.
 
