@@ -29,6 +29,8 @@ The bridge functionality allows communication and interaction between different 
 
 #### Horizontal Shard
 
+In a blockchain network, a shard refers to a subset of the network responsible for processing a portion of the transactions. Horizontal sharding involves dividing the blockchain network into multiple shards, where each shard processes a specific set of transactions. This division enhances scalability by distributing the computational workload across different shards, allowing for parallel transaction processing. Each shard typically maintains its own set of validators or miners responsible for validating and adding new blocks to the shard. Sharding can significantly increase the transaction throughput and overall network capacity of a blockchain system.
+
 Horizontal sharding involves dividing a blockchain network into multiple shards, with each shard responsible for processing a subset of transactions. The `Chain` class includes functions to manage shards and perform transactions within them:
 
 - `createShard`: This function creates a new shard with the given name. It sets up a separate shard within the chain, allowing specific transactions to be processed independently.
