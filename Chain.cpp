@@ -12,136 +12,587 @@
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This code represents a portion of a blockchain implementation using the SPHINX blockchain framework. The code into its components and explain their functionality:
+// This code defines a class called Chain that represents a blockchain. The Chain class has various member functions and data members that provide functionality for managing the blockchain and performing operations such as adding blocks, transferring funds, creating bridges, and handling transactions.
 
-  // Chain::Chain(): This is the constructor of the Chain class. It creates the blockchain by initializing the genesis block. The genesis block is the first block in the blockchain and serves as the starting point.
+// Namespaces: The code starts with using directives for the json namespace from the nlohmann library, and forward declarations for the SPHINXBlock::Block class and SPHINXHash::SPHINX_256 and SPHINXTrx::SPHINXTrx functions.
 
-  // Chain::addBlock(const SPHINXBlock& block): This function is responsible for adding a new block to the blockchain. It takes a SPHINXBlock object as a parameter, representing the block to be added. The function calculates the hash of the block's data, signs the block's hash using a private key, and adds the block and its signature to the chain.
+// Class Declaration: The Chain class is declared and defined. It contains various member functions and data members that define the behavior and state of the blockchain.
 
-  // Chain::isChainValid() const: This function validates the integrity of the blockchain. It iterates through the blocks in the blockchain, starting from the second block, and verifies the consistency of each block. It checks if the block's calculated hash matches the actual hash computed from the block's data and verifies the block's signature. If any discrepancy is found, the function returns false, indicating that the chain is invalid. If all blocks pass the verification checks, the function returns true, indicating that the chain is valid.
+// Data Members: The Chain class has several private data members:
+    // shards_: A vector of Shard structs representing the shards of the chain.
+    // blocks_: A vector of SPHINXBlock::Block objects representing the blocks of the chain.
+    // publicKey_: A string representing the public key of the chain.
+    // BLOCK_NOT_FOUND: A constant value representing an indicator for a block not found.
+    // shardIndices_: An unordered map that stores the indices of shards by shard name for quick access.
+    // balances_: An unordered map that stores the balances of addresses in the chain.
+    // bridgeAddress_: A string representing the bridge address of the chain.
+    // bridgeSecret_: A string representing the bridge secret of the chain.
+    // targetChain_: An instance of the Chain class representing the target chain.
 
-  // Chain::getGenesisBlock() const: This function retrieves the genesis block, which is the first block in the blockchain. It returns the first element of the blocks_ vector.
+// Constructor: The Chain class has a default constructor that initializes the blockchain with a genesis block.
 
-  // Chain::getBlockAt(size_t index) const: This function retrieves a block at a specified index in the blockchain. It takes an index as a parameter and returns the corresponding block from the blocks_ vector. If the index is out of range, it throws an out_of_range exception.
+// Member Functions: The Chain class provides various member functions to perform operations on the blockchain. Here are some of the key member functions:
 
-  // Chain::getChainLength() const: This function returns the length or size of the chain, which is the number of blocks in the blockchain. It simply returns the size of the blocks_ vector.
+    // addBlock: Adds a block to the chain.
+    // getBlockHash: Retrieves the hash of a block at a specific height in the chain.
+    // transferFromSidechain: Transfers blocks from a sidechain to the main chain.
+    // handleBridgeTransaction: Handles a transaction from a bridge to the target chain.
+    // toJson and fromJson: Convert the chain to and from JSON format.
+    // save and load: Save and load the chain data to and from a file.
+    // getGenesisBlock: Retrieves the genesis block of the chain.
+    // getBlockAt: Retrieves a block at a specific index in the chain.
+    // getChainLength: Retrieves the length of the chain.
+    // visualizeChain: Prints a visualization of the chain.
+    // connectToSidechain: Connects to a sidechain.
+    // transferFromSidechain: Transfers funds from a sidechain to the main chain.
+    // createBlockchainBridge: Creates a bridge between the current chain and a target chain.
+    // handleBridgeTransaction: Handles a bridge transaction.
+    // performAtomicSwap: Performs an atomic swap with another chain.
+    // signTransaction and broadcastTransaction: Sign and broadcast a transaction to the network.
+    // updateBalance and getBalance: Update and retrieve the balance of an address.
+    // verifyAtomicSwap: Verifies an atomic swap transaction.
+    // handleTransfer: Handles a transfer transaction.
+    // getBridgeAddress and getBridgeSecret: Retrieves the bridge address and secret of the chain.
 
-  // Chain::visualizeChain() const: This function visualizes the blockchain for analysis or presentation purposes. It iterates through the blocks in the blocks_ vector and prints information about each block. The specific details printed or displayed can be customized according to requirements.
+// Sharding chain functionality: The chain also supports sharding functionality with member functions for creating shards, joining shards, transferring funds to shards, handling shard transfers, performing shard atomic swaps, updating shard balances, and getting shard balances.
 
-  // Chain::toJson() const: This function serializes the blockchain into a JSON format. It creates a JSON object and populates it with an array of JSON representations of each block in the blockchain. The toJson function of each SPHINXBlock object is called to convert the block to JSON format.
-
-  // Chain::fromJson(const json& chainJson): This function deserializes the blockchain from a JSON format. It takes a JSON object as a parameter, representing the serialized blockchain. The function clears the existing blocks_ vector and iterates through the JSON array of blocks. For each block, a new SPHINXBlock object is created and initialized using the fromJson function, and the block is added to the blocks_ vector. If the JSON structure is invalid or contains missing fields, it throws an invalid_argument exception.
-
-  // The SPHINX_Chain namespace encapsulates the blockchain-related functionality, including block addition, validation, retrieval, visualization, and serialization/deserialization. It uses the SPHINXBlock class, which represents individual blocks in the blockchain. The SPHINXSign and SPHINXVerify namespaces are used for block signing and verification processes, respectively.
+// Overall, the Chain class provides a set of functions and data members to manage and interact with a blockchain. It supports basic blockchain operations, transaction handling, bridge creation and transaction handling, atomic swaps, and sharding functionality.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+
+#include <unordered_map>
+#include <limits>
+#include <chrono>
+#include <thread>
+#include <ctime>
+#include <stdexcept>
+#include <fstream>
 #include <array>
 #include <iostream>
 #include <string>
+#include <vector>
+
 #include "Chain.hpp"
 #include "json.hpp"
 #include "Block.hpp"
 #include "Verify.hpp"
 #include "Sign.hpp"
+#include "Key.hpp"
+#include "Verify.hpp"
+#include "Trx.hpp"
+
 
 using json = nlohmann::json;
 
+// Forward declarations
+namespace SPHINXBlock {
+    class Block;
+}
+
+namespace SPHINXHash {
+    std::string SPHINX_256(const std::string& message);
+}
+
+namespace SPHINXTrx {
+    std::string SPHINXTrx(const std::string& message);
+}
 
 namespace SPHINX_Chain {
 
+    class Chain {
+    public:
+        Chain();
+        void addBlock(const SPHINXBlock::Block& block);  // Add a block to the chain
+        std::string getBlockHash(uint32_t blockHeight) const;  // Get the hash of a block at a specific height
+        void transferFromSidechain(const SPHINX_Chain::Chain& sidechain, const std::string& blockHash);  // Transfer blocks from a sidechain to the main chain
+        void handleBridgeTransaction(const std::string& bridge, const std::string& targetChain, const std::string& transaction);  // Handle a transaction from a bridge to the target chain
+        nlohmann::json toJson() const;  // Convert the chain to JSON format
+        void fromJson(const nlohmann::json& chainJson);  // Load chain data from JSON
+        bool save(const nlohmann::json& chainJson, const std::string& filename) const;  // Save the chain data to a file
+        static Chain load(const std::string& filename);  // Load the chain from a file
+        SPHINXBlock::Block getGenesisBlock() const;  // Get the genesis block of the chain
+        SPHINXBlock::Block getBlockAt(size_t index) const;  // Get a block at a specific index
+        size_t getChainLength() const;  // Get the length of the chain
+        void visualizeChain() const;  // Print a visualization of the chain
+        void connectToSidechain(const Chain& sidechain);  // Connect to a sidechain
+        void transferFromSidechain(const std::string& sidechainAddress, const std::string& senderAddress, double amount);  // Transfer funds from a sidechain to the main chain
+        void createBlockchainBridge(const Chain& targetChain);  // Create a bridge between the current chain and a target chain
+        void handleBridgeTransaction(const std::string& bridgeAddress, const std::string& recipientAddress, double amount);  // Handle a bridge transaction
+        void performAtomicSwap(const Chain& targetChain, const std::string& senderAddress, const std::string& receiverAddress, double amount);  // Perform an atomic swap with another chain
+        void signTransaction(SPHINXTrx::Transaction& transaction);  // Sign a transaction
+        void broadcastTransaction(const SPHINXTrx::Transaction& transaction);  // Broadcast a transaction to the network
+        void updateBalance(const std::string& address, double amount);  // Update the balance of an address
+        double getBalance(const std::string& address) const;  // Get the balance of an address
+        bool verifyAtomicSwap(const SPHINXTrx::Transaction& transaction, const Chain& targetChain) const;  // Verify an atomic swap transaction
+        void handleTransfer(const SPHINXTrx::Transaction& transaction);  // Handle a transfer transaction
+        std::string getBridgeAddress() const;  // Get the bridge address of the chain
+        std::string getBridgeSecret() const;  // Get the bridge secret of the chain
+        // Sharding chain functionality
+        void createShard(const std::string& shardName);  // Create a shard with the given name
+        void joinShard(const std::string& shardName, const Chain& shardChain);  // Join a shard with the given name and chain
+        void transferToShard(const std::string& shardName, const std::string& senderAddress, const std::string& recipientAddress, double amount);  // Transfer funds to a shard
+        void handleShardTransfer(const std::string& shardName, const SPHINXTrx::Transaction& transaction);  // Handle a transfer transaction in a shard
+        void handleShardBridgeTransaction(const std::string& shardName, const std::string& bridgeAddress, const std::string& recipientAddress, double amount);  // Handle a bridge transaction in a shard
+        void performShardAtomicSwap(const std::string& shardName, const Chain& targetShard, const std::string& senderAddress, const std::string& receiverAddress, double amount);  // Perform an atomic swap with a shard
+        void updateShardBalance(const std::string& shardName, const std::string& address, double amount);  // Update the balance of an address in a shard
+        double getShardBalance(const std::string& shardName, const std::string& address) const;  // Get the balance of an address in a shard
+
+    private:
+        struct Shard {
+            Chain chain;
+            std::string bridgeAddress;
+            std::string bridgeSecret;
+            std::unordered_map<std::string, double> balances;
+        };
+        std::vector<Shard> shards_;  // Shards of the chain
+        std::vector<SPHINXBlock::Block> blocks_;  // Blocks of the chain
+        std::string publicKey_;  // Public key of the chain
+        static constexpr uint32_t BLOCK_NOT_FOUND = std::numeric_limits<uint32_t>::max();  // Block not found constant
+        std::unordered_map<std::string, uint32_t> shardIndices_;  // Indices of shards
+
+        std::unordered_map<std::string, double> balances_;  // Add this line
+        std::string bridgeAddress_;  // Add this line
+        std::string bridgeSecret_;  // Add this line
+        SPHINX_Chain::Chain targetChain_;  // Add this line
+    };
+
     Chain::Chain() {
-        // Create the genesis block with the provided message
-        std::string genesisMessage = "Welcome to Post-Quantum era, The Beginning of a Secured-Trustless Economy will start from here - SPHINX Blockchain Genesis";
-        SPHINXBlock genesisBlock(genesisMessage);
-
-        // Add the genesis block to the chain
-        blocks_.push_back(genesisBlock);
+        std::string genesisMessage = "Welcome to Post-Quantum era, The Beginning of a Secured-Trustless Network will start from here - SPHINX Network";
+        SPHINXBlock::Block genesisBlock(SPHINXHash::SPHINX_256(genesisMessage));
+        addBlock(genesisBlock);  // Add the genesis block to the chain
     }
 
-    void Chain::addBlock(const SPHINXBlock& block) {
-        // Add block to the blockchain
-        // Calculate the hash of the block's data
-        std::string blockHash = block.calculateBlockHash();
-
-        // Sign the block's hash using the private key
-        std::string signature = SPHINXSign::sign(blockHash, privateKey_);
-
-        // Add the block and its signature to the chain
-        blocks_.emplace_back(block, signature);
-    }
-
-    bool Chain::isChainValid() const {
-        // Validate the integrity of the blockchain
-        for (size_t i = 1; i < blocks_.size(); ++i) {
-            const SPHINXBlock& currentBlock = blocks_[i];
-            const SPHINXBlock& previousBlock = blocks_[i - 1];
-
-            // Verify the block's hash and previous block hash
-            if (currentBlock.getBlockHash() != currentBlock.calculateBlockHash() ||
-                currentBlock.getPreviousHash() != previousBlock.calculateBlockHash()) {
-                return false;
+    void Chain::addBlock(const SPHINXBlock::Block& block) {
+        if (blocks_.empty()) {  // If the chain is empty
+            blocks_.push_back(block);  // Add the block to the chain
+        } else {
+            if (block.verifyBlock(publicKey_)) {  // Verify the block using the public key
+                blocks_.push_back(block);  // Add the block to the chain
+            } else {
+                throw std::runtime_error("Invalid block! Block verification failed.");  // Throw an error if the block verification fails
             }
+        }
+    }
 
-            // Verify the signature of the block
-            if (!SPHINXVerify::verifySPHINXBlock(currentBlock, currentBlock.getSignature(), publicKey_)) {
-                return false;
+    std::string Chain::getBlockHash(uint32_t blockHeight) const {
+        if (blockHeight >= blocks_.size()) {  // If the block height is out of range
+            throw std::out_of_range("Block height out of range.");  // Throw an out-of-range error
+        }
+        return blocks_[blockHeight].getBlockHash();  // Get the hash of the block at the given height
+    }
+
+    void Chain::transferFromSidechain(const SPHINX_Chain::Chain& sidechain, const std::string& blockHash) {
+        uint32_t blockHeight = BLOCK_NOT_FOUND;  // Initialize the block height variable
+        for (uint32_t i = 0; i < sidechain.getChainLength(); ++i) {  // Iterate over the blocks in the sidechain
+            if (sidechain.getBlockHash(i) == blockHash) {  // Check if the block hash matches the given block hash
+                blockHeight = i;  // Store the block height
+                break;
             }
         }
 
-        return true;
+        if (blockHeight == BLOCK_NOT_FOUND) {  // If the block is not found in the main chain
+            throw std::runtime_error("Block not found in the main chain.");  // Throw an error
+        }
+
+        const SPHINXBlock::Block& block = sidechain.getBlockAt(blockHeight);  // Get the block at the specified height from the sidechain
+        if (block.verifyBlock(publicKey_)) {  // Verify the block using the public key
+            blocks_.push_back(block);  // Add the block to the chain
+        } else {
+            throw std::runtime_error("Invalid block! Block verification failed.");  // Throw an error if the block verification fails
+        }
     }
 
-    SPHINXBlock Chain::getGenesisBlock() const {
-        // Get the first block in the blockchain
-        return blocks_.front();
+    void Chain::handleBridgeTransaction(const std::string& bridge, const std::string& targetChain, const std::string& transaction) {
+        if (bridge == "SPHINX") {  // Check if the bridge is "SPHINX"
+            bool isValid = SPHINXVerify::validateTransaction(transaction);  // Validate the transaction
+            if (!isValid) {  // If the transaction is not valid
+                throw std::runtime_error("Invalid transaction! Transaction validation failed.");  // Throw an error
+            }
+            targetChain_.addTransaction(transaction);  // Add the transaction to the target chain
+        } else {
+            throw std::runtime_error("Invalid bridge!");  // If the bridge is invalid, throw an error
+        }
     }
 
-    SPHINXBlock Chain::getBlockAt(size_t index) const {
-        // Get the block at the specified index
+    nlohmann::json Chain::toJson() const {
+    nlohmann::json chainJson;
+
+        // Serialize the blocks
+        nlohmann::json blocksJson = nlohmann::json::array();
+        for (const SPHINXBlock::Block& block : blocks_) {
+            blocksJson.push_back(block.toJson());
+        }
+        chainJson["blocks"] = blocksJson;
+
+        // Serialize the public key
+        chainJson["publicKey"] = publicKey_;
+
+        // Serialize the shards
+        chainJson["shards"] = nlohmann::json::array();
+        for (const Shard& shard : shards_) {
+            nlohmann::json shardJson;
+            shardJson["chain"] = shard.chain.toJson();  // Serialize the shard's chain
+            shardJson["bridgeAddress"] = shard.bridgeAddress;  // Serialize the bridge address
+            shardJson["bridgeSecret"] = shard.bridgeSecret;  // Serialize the bridge secret
+            shardJson["balances"] = shard.balances;  // Serialize the balances
+            chainJson["shards"].push_back(shardJson);
+        }
+
+        return chainJson;
+    }
+
+    void Chain::fromJson(const nlohmann::json& chainJson) {
+        blocks_.clear();
+
+        // Deserialize the blocks
+        const nlohmann::json& blocksJson = chainJson["blocks"];
+        for (const auto& blockJson : blocksJson) {
+            SPHINXBlock::Block block("");
+            block.fromJson(blockJson);
+            blocks_.push_back(block);
+        }
+
+        // Deserialize the public key
+        publicKey_ = chainJson["publicKey"].get<std::string>();
+
+        shards_.clear();
+
+        // Deserialize the shards
+        const nlohmann::json& shardsJson = chainJson["shards"];
+        for (const auto& shardJson : shardsJson) {
+            Shard shard;
+            shard.chain.fromJson(shardJson["chain"]);  // Deserialize the shard's chain
+            shard.bridgeAddress = shardJson["bridgeAddress"].get<std::string>();  // Deserialize the bridge address
+            shard.bridgeSecret = shardJson["bridgeSecret"].get<std::string>();  // Deserialize the bridge secret
+            shard.balances = shardJson["balances"].get<std::unordered_map<std::string, double>>();  // Deserialize the balances
+            shards_.push_back(shard);
+        }
+
+        // Build shard indices for quick access
+        shardIndices_.clear();
+        for (uint32_t i = 0; i < shards_.size(); ++i) {
+            const std::string& shardName = shards_[i].chain.getBridgeAddress();
+            shardIndices_[shardName] = i;
+        }
+    }
+
+
+    bool Chain::save(const nlohmann::json& chainJson, const std::string& filename) const {
+        std::ofstream outputFile(filename);
+        if (outputFile.is_open()) {
+            outputFile << chainJson.dump(4);  // Write the formatted JSON data to the file
+            outputFile.close();
+            return true;
+        }
+        return false;
+    }
+
+    Chain Chain::load(const std::string& filename) {
+        std::ifstream inputFile(filename);
+        if (inputFile.is_open()) {
+            json chainJson;
+            inputFile >> chainJson;  // Read the JSON data from the file
+            inputFile.close();
+            Chain loadedChain;
+            loadedChain.fromJson(chainJson);  // Deserialize the JSON data into a Chain object
+            return loadedChain;
+        }
+        throw std::runtime_error("Failed to load chain from file: " + filename);
+    }
+
+    SPHINXBlock::Block Chain::getGenesisBlock() const {
+        return blocks_.front();  // Return the first block in the chain
+    }
+
+    SPHINXBlock::Block Chain::getBlockAt(size_t index) const {
         if (index < blocks_.size()) {
-            return blocks_[index];
+            return blocks_[index];  // Return the block at the specified index
         } else {
             throw std::out_of_range("Index out of range");
         }
     }
 
     size_t Chain::getChainLength() const {
-        // Get the length or size of the chain
-        return blocks_.size();
+        return blocks_.size();  // Return the number of blocks in the chain
     }
 
     void Chain::visualizeChain() const {
-        // Visualize the blockchain for analysis or presentation purposes
         for (size_t i = 0; i < blocks_.size(); ++i) {
-            const SPHINXBlock& block = blocks_[i];
-            std::cout << "Block " << i << " - Hash: " << block.getBlockHash() << std::endl;
-            // Print or display other block details as desired
+            const SPHINXBlock::Block& block = blocks_[i];
+            std::cout << "Block " << i << " - Hash: " << block.getBlockHash() << std::endl;  // Print the index and hash of each block
         }
     }
 
-    // Serialize the chain to JSON
-    json Chain::toJson() const {
-        json chainJson;
-        chainJson["blocks"] = json::array();
-        for (const SPHINXBlock& block : blocks_) {
-            chainJson["blocks"].push_back(block.toJson());
-        }
-        return chainJson;
+    void Chain::connectToSidechain(const Chain& sidechain) {
+        SidechainConnection connection(sidechain.getBridgeAddress(), sidechain.getBridgeSecret());  // Create a connection to the sidechain using its bridge address and secret
+        connection.sync();  // Synchronize the connection
     }
 
-    // Deserialize the chain from JSON
-    void Chain::fromJson(const json& chainJson) {
-        blocks_.clear();
-        if (chainJson.contains("blocks") && chainJson["blocks"].is_array()) {
-            const json& blocksJson = chainJson["blocks"];
-            for (const json& blockJson : blocksJson) {
-                SPHINXBlock block;
-                block.fromJson(blockJson);
-                blocks_.push_back(block);
+    void Chain::transferFromSidechain(const std::string& sidechainAddress, const std::string& senderAddress, double amount) {
+        double senderBalance = getBalance(senderAddress);  // Get the balance of the sender
+        if (amount > senderBalance) {
+            throw std::runtime_error("Sender does not have enough funds");  // Throw an error if the sender doesn't have enough funds
+        }
+
+        if (!TwoFactorAuthenticator::verifyCode(senderUsername, sender2FACode)) {
+            throw std::runtime_error("Authentication failed");  // Throw an error if authentication fails
+        }
+
+        SPHINXKey::HybridKeypair keyPair = SPHINXKey::generate_and_perform_key_exchange();  // Generate and perform a key exchange
+        std::string publicKey = SPHINXKey::calculatePublicKey(keyPair.merged_key.kyber_private_key.data());  // Calculate the public key
+        SPHINXTrx::Transaction transferTransaction = createTransaction(sidechainAddress, senderAddress, amount);  // Create a transaction
+        signTransaction(transferTransaction);  // Sign the transaction
+        broadcastTransaction(transferTransaction);  // Broadcast the transaction
+        handleTransfer(transferTransaction);  // Handle the transfer
+    }
+
+    void Chain::createBlockchainBridge(const Chain& targetChain) {
+        std::string bridgeAddress = generateBridgeAddress();  // Generate a bridge address for the current chain
+        std::string targetBridgeAddress = targetChain.generateBridgeAddress();  // Generate a bridge address for the target chain
+        std::shared_ptr<CloudflareSecureBridgeConnection> connection = std::make_shared<CloudflareSecureBridgeConnection>(bridgeAddress, targetBridgeAddress);  // Create a connection using the bridge addresses
+        connection->createBridge();  // Create a bridge using the connection
+    }
+
+    void Chain::handleBridgeTransaction(const std::string& bridgeAddress, const std::string& recipientAddress, double amount) {
+        if (!bridge.verifyTransaction(bridgeAddress, amount)) {
+            throw std::runtime_error("Invalid bridge transaction");  // Throw an error if the bridge transaction is invalid
+        }
+
+        if (!TwoFactorAuthenticator::verifyCode(senderUsername, sender2FACode)) {
+            throw std::runtime_error("Authentication failed");  // Throw an error if authentication fails
+        }
+
+        SPHINXKey::HybridKeypair keyPair = SPHINXKey::generate_and_perform_key_exchange();  // Generate and perform a key exchange
+        std::string publicKey = SPHINXKey::calculatePublicKey(keyPair.merged_key.kyber_private_key.data());  // Calculate the public key
+        std::string transactionData = bridge.getTransactionData(bridgeAddress);  // Get the transaction data from the bridge
+        std::string signature = SPHINXSign::sign(transactionData, keyPair.merged_key.kyber_private_key.data());  // Sign the transaction data
+
+        if (!SPHINXVerify::verifySignature(transactionData, signature, publicKey)) {
+            throw std::runtime_error("Authentication failed");  // Throw an error if the signature verification fails
+        }
+
+        std::string transactionHash = SPHINXHash::SPHINX_256(transactionData);  // Calculate the transaction hash
+        targetChain.transfer(recipientAddress, amount);  // Transfer funds to the recipient address in the target chain
+        updateBalance(recipientAddress, amount);  // Update the balance of the recipient address
+        updateBalance(senderAddress, -amount);  // Update the balance of the sender address
+    }
+
+    void Chain::performAtomicSwap(const Chain& targetChain, const std::string& senderAddress, const std::string& receiverAddress, double amount) {
+        double senderBalance = getBalance(senderAddress);  // Get the balance of the sender address
+        double receiverBalance = targetChain.getBalance(receiverAddress);  // Get the balance of the receiver address in the target chain
+        if (senderBalance < amount) {
+            throw std::runtime_error("Sender does not have enough funds");  // Throw an error if the sender doesn't have enough funds
+        }
+
+        if (!TwoFactorAuthenticator::verifyCode(senderUsername, sender2FACode)) {
+            throw std::runtime_error("Authentication failed");  // Throw an error if authentication fails
+        }
+
+        SPHINXTrx::Transaction senderTransaction = createTransaction(senderAddress, targetChain.getBridgeAddress(), amount);  // Create a transaction from the sender address to the target chain bridge address
+        SPHINXTrx::Transaction receiverTransaction = targetChain.createTransaction(receiverAddress, senderAddress, amount);  // Create a transaction from the receiver address in the target chain to the sender address
+
+        signTransaction(senderTransaction);  // Sign the sender transaction
+        signTransaction(receiverTransaction);  // Sign the receiver transaction
+        broadcastTransaction(senderTransaction);  // Broadcast the sender transaction
+        targetChain.broadcastTransaction(receiverTransaction);  // Broadcast the receiver transaction
+
+        while (true) {
+            if (senderTransaction.isConfirmed() && receiverTransaction.isConfirmed()) {
+                break;  // Exit the loop if both transactions are confirmed
             }
-        } else {
-            throw std::invalid_argument("Invalid JSON structure or missing fields");
+            std::this_thread::sleep_for(std::chrono::seconds(10));  // Sleep for 10 seconds before checking the confirmation status again
         }
+
+        if (!verifyAtomicSwap(senderTransaction, targetChain) || !targetChain.verifyAtomicSwap(receiverTransaction, *this)) {
+            throw std::runtime_error("Atomic swap verification failed");  // Throw an error if the atomic swap verification fails
+        }
+
+        updateBalance(senderAddress, -amount);  // Update the balance of the sender address
+        targetChain.updateBalance(receiverAddress, amount);  // Update the balance of the receiver address in the target chain
+    }
+
+    void Chain::signTransaction(SPHINXTrx::Transaction& transaction) {
+        std::string transactionData = bridge.getTransactionData(bridgeAddress_);  // Get the transaction data from the bridge
+        std::string privateKey = SPHINXSign::getPrivateKey();  // Get the private key
+        std::string signature = SPHINXSign::sign(transactionData, privateKey);  // Sign the transaction data using the private key
+        transaction.setSignature(signature);  // Set the transaction signature
+    }
+
+    void Chain::broadcastTransaction(const SPHINXTrx::Transaction& transaction) {
+        std::string transactionJson = transaction.toJson().dump();  // Convert the transaction to JSON
+        bridge.broadcastTransaction(bridgeAddress_, transactionJson);  // Broadcast the transaction via the bridge
+    }
+
+    void Chain::updateBalance(const std::string& address, double amount) {
+        balances_[address] += amount;  // Update the balance of the given address by adding the specified amount
+    }
+
+    double Chain::getBalance(const std::string& address) const {
+        if (balances_.count(address) > 0) {
+            return balances_.at(address);  // Return the balance of the given address if it exists
+        }
+        return 0.0;  // Return 0 if the balance of the given address is not found
+    }
+
+    bool Chain::verifyAtomicSwap(const SPHINXTrx::Transaction& transaction, const Chain& targetChain) const {
+        std::string transactionData = bridge.getTransactionData(bridgeAddress_);
+        std::string signature = transaction.getSignature();
+        std::string senderPublicKey = transaction.getSenderPublicKey();
+        // Verify the transaction signature and the bridge transaction in the target chain
+        return SPHINXVerify::verifySignature(transactionData, signature, senderPublicKey) && targetChain.verifyBridgeTransaction(transaction);
+    }
+
+    void Chain::handleTransfer(const SPHINXTrx::Transaction& transaction) {
+        std::string recipientAddress = transaction.getRecipientAddress();
+        double amount = transaction.getAmount();
+        updateBalance(recipientAddress, amount);  // Update the balance of the recipient address
+    }
+
+    std::string Chain::getBridgeAddress() const {
+        return bridgeAddress_;
+    }
+
+    std::string Chain::getBridgeSecret() const {
+        return bridgeSecret_;
+    }
+
+    // Sharding chain functionality
+
+    void Chain::createShard(const std::string& shardName) {
+        Shard shard;
+        shard.bridgeAddress = shardName;
+        shard.chain = Chain();
+        shards_.push_back(shard);  // Add a new shard to the shard vector
+        shardIndices_[shardName] = shards_.size() - 1;  // Store the shard index by shard name for quick access
+    }
+
+    void Chain::joinShard(const std::string& shardName, const Chain& shardChain) {
+        auto it = shardIndices_.find(shardName);
+        if (it == shardIndices_.end()) {
+            throw std::runtime_error("Shard does not exist: " + shardName);  // Throw an error if the shard does not exist
+        }
+        shards_[it->second].chain = shardChain;  // Join the shard by assigning the shard chain to the corresponding shard
+    }
+
+    void Chain::transferToShard(const std::string& shardName, const std::string& senderAddress, const std::string& recipientAddress, double amount) {
+        auto it = shardIndices_.find(shardName);
+        if (it == shardIndices_.end()) {
+            throw std::runtime_error("Shard does not exist: " + shardName);  // Throw an error if the shard does not exist
+        }
+        Shard& shard = shards_[it->second];  // Get the reference to the shard
+        double senderBalance = getBalance(senderAddress);
+        if (amount > senderBalance) {
+            throw std::runtime_error("Sender does not have enough funds");  // Throw an error if the sender doesn't have enough funds
+        }
+
+        if (!TwoFactorAuthenticator::verifyCode(senderUsername, sender2FACode)) {
+            throw std::runtime_error("Authentication failed");  // Throw an error if authentication fails
+        }
+
+        SPHINXKey::HybridKeypair keyPair = SPHINXKey::generate_and_perform_key_exchange();  // Generate and perform a key exchange
+        std::string publicKey = SPHINXKey::calculatePublicKey(keyPair.merged_key.kyber_private_key.data());  // Calculate the public key
+        SPHINXTrx::Transaction transferTransaction = createTransaction(shard.bridgeAddress, senderAddress, amount);  // Create a transaction to the shard bridge address
+        signTransaction(transferTransaction);  // Sign the transaction
+        broadcastTransaction(transferTransaction);  // Broadcast the transaction
+        shard.chain.handleShardTransfer(shardName, transferTransaction);  // Handle the shard transfer in the shard chain
+        updateBalance(senderAddress, -amount);  // Update the balance of the sender address
+    }
+
+    void Chain::handleShardTransfer(const std::string& shardName, const SPHINXTrx::Transaction& transaction) {
+        auto it = shardIndices_.find(shardName);
+        if (it == shardIndices_.end()) {
+            throw std::runtime_error("Shard does not exist: " + shardName);  // Throw an error if the shard does not exist
+        }
+        Shard& shard = shards_[it->second];  // Get the reference to the shard
+        shard.chain.handleTransfer(transaction);  // Handle the transfer in the shard chain
+    }
+
+    void Chain::handleShardBridgeTransaction(const std::string& shardName, const std::string& bridgeAddress, const std::string& recipientAddress, double amount) {
+        auto it = shardIndices_.find(shardName);
+        if (it == shardIndices_.end()) {
+            throw std::runtime_error("Shard does not exist: " + shardName);  // Throw an error if the shard does not exist
+        }
+        Shard& shard = shards_[it->second];  // Get the reference to the shard
+        if (!shard.bridge.verifyTransaction(bridgeAddress, amount)) {
+            throw std::runtime_error("Invalid bridge transaction");  // Throw an error if the bridge transaction is invalid
+        }
+
+        if (!TwoFactorAuthenticator::verifyCode(senderUsername, sender2FACode)) {
+            throw std::runtime_error("Authentication failed");  // Throw an error if authentication fails
+        }
+
+        SPHINXKey::HybridKeypair keyPair = SPHINXKey::generate_and_perform_key_exchange();  // Generate and perform a key exchange
+        std::string publicKey = SPHINXKey::calculatePublicKey(keyPair.merged_key.kyber_private_key.data());  // Calculate the public key
+        std::string transactionData = shard.bridge.getTransactionData(bridgeAddress);  // Get the transaction data from the shard bridge
+        std::string signature = SPHINXSign::sign(transactionData, keyPair.merged_key.kyber_private_key.data());  // Sign the transaction data
+
+        if (!SPHINXVerify::verifySignature(transactionData, signature, publicKey)) {
+            throw std::runtime_error("Authentication failed");  // Throw an error if authentication fails
+        }
+
+        std::string transactionHash = SPHINXHash::SPHINX_256(transactionData);
+        shard.chain.updateBalance(recipientAddress, amount);  // Update the balance of the recipient address in the shard chain
+        shard.chain.updateBalance(senderAddress, -amount);  // Update the balance of the sender address in the shard chain
+    }
+
+    void Chain::performShardAtomicSwap(const std::string& shardName, const Chain& targetShard, const std::string& senderAddress, const std::string& receiverAddress, double amount) {
+        auto it = shardIndices_.find(shardName);
+        if (it == shardIndices_.end()) {
+            throw std::runtime_error("Shard does not exist: " + shardName);  // Throw an error if the shard does not exist
+        }
+        Shard& shard = shards_[it->second];  // Get the reference to the shard
+        double senderBalance = getBalance(senderAddress);
+        double receiverBalance = targetShard.getBalance(receiverAddress);
+        if (senderBalance < amount) {
+            throw std::runtime_error("Sender does not have enough funds");  // Throw an error if the sender does not have enough funds
+        }
+
+        if (!TwoFactorAuthenticator::verifyCode(senderUsername, sender2FACode)) {
+            throw std::runtime_error("Authentication failed");  // Throw an error if authentication fails
+        }
+
+        SPHINXTrx::Transaction senderTransaction = createTransaction(senderAddress, shard.bridgeAddress, amount);  // Create a transaction from the sender to the shard bridge
+        SPHINXTrx::Transaction receiverTransaction = targetShard.createTransaction(receiverAddress, senderAddress, amount);  // Create a transaction from the shard bridge to the receiver
+
+        signTransaction(senderTransaction);  // Sign the sender transaction
+        signTransaction(receiverTransaction);  // Sign the receiver transaction
+        broadcastTransaction(senderTransaction);  // Broadcast the sender transaction
+        targetShard.broadcastTransaction(receiverTransaction);  // Broadcast the receiver transaction
+
+        while (true) {
+            if (senderTransaction.isConfirmed() && receiverTransaction.isConfirmed()) {
+                break;  // Wait until both transactions are confirmed
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(10));  // Sleep for 10 seconds before checking confirmation status again
+        }
+
+        if (!verifyAtomicSwap(senderTransaction, shard.chain) || !targetShard.verifyAtomicSwap(receiverTransaction, shard.chain)) {
+            throw std::runtime_error("Atomic swap verification failed");  // Throw an error if atomic swap verification fails
+        }
+
+        updateBalance(senderAddress, -amount);  // Update the balance of the sender address
+        targetShard.updateBalance(receiverAddress, amount);  // Update the balance of the receiver address in the target shard
+    }
+
+    void Chain::updateShardBalance(const std::string& shardName, const std::string& address, double amount) {
+        auto it = shardIndices_.find(shardName);
+        if (it == shardIndices_.end()) {
+            throw std::runtime_error("Shard does not exist: " + shardName);  // Throw an error if the shard does not exist
+        }
+        Shard& shard = shards_[it->second];  // Get the reference to the shard
+        shard.balances[address] += amount;  // Update the balance of the given address in the shard
+    }
+
+    double Chain::getShardBalance(const std::string& shardName, const std::string& address) const {
+        auto it = shardIndices_.find(shardName);
+        if (it == shardIndices_.end()) {
+            throw std::runtime_error("Shard does not exist: " + shardName);  // Throw an error if the shard does not exist
+        }
+        const Shard& shard = shards_[it->second];  // Get the reference to the shard
+        if (shard.balances.count(address) > 0) {
+            return shard.balances.at(address);  // Return the balance of the given address in the shard if it exists
+        }
+        return 0.0;  // Return 0.0 if the address balance is not found in the shard
     }
 } // namespace SPHINX_Chain
