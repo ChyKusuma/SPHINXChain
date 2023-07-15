@@ -57,9 +57,9 @@ These features collectively contribute to the functionality, scalability, and in
 After the class declaration, the code defines the member functions of the Chain class. Each function is implemented with its respective functionality.
 
 
-### This repository is part of the  [SPHINXPoW](https://github.com/SPHINX-HUB-ORG/SPHINXPoW) [SPHINXMiner](https://github.com/SPHINX-HUB-ORG/SPHINXMINER) [SPHINXBlock](https://github.com/SPHINX-HUB-ORG/SPHINXBLOCK)
+### Note
 
-Please note that the code in this repository is a part of the SPHINX blockchain algorithm, which is currently in development and not fully integrated or extensively tested for functionality. The purpose of this repository is to provide a framework and algorithm for SPHINX "Chain" blockchain project.
+Every code in this repository is a part of the SPHINX blockchain algorithm, which is currently in development and not fully integrated or extensively tested for functionality. The purpose of this repository is to provide a framework and algorithm for SPHINX "Chain" blockchain project.
 
 As the project progresses, further updates and enhancements will be made to ensure the code's stability and reliability. We encourage contributors to participate in improving and refining the SPHINXBlock algorithm by submitting pull requests and providing valuable insights.
 
