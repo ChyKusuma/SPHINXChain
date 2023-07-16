@@ -8,51 +8,52 @@ This repository contains code for the SPHINXChain project, which is a `Chain` mo
 
 ## Components
 
-### Namespace Declarations
+# Namespace Declarations
 
-The code starts with several namespace declarations:
+The code begins with several namespace declarations:
 
 - The `SPHINXBlock` namespace contains the `Block` class.
 - The `SPHINXHash` namespace contains the `SPHINX_256` function.
 - The `SPHINXTrx` namespace contains the `SPHINXTrx` function.
 
-### Class Declaration: Chain
+## Class Declaration: Chain
 
 The `Chain` class represents a chain in the SPHINX network. It provides the following member functions:
 
-#### Bridge
+### Bridge Functionality
 
 The bridge functionality allows communication and interaction between different chains in the SPHINX network. It enables the transfer of assets and transactions between chains. The `Chain` class provides the following functions related to bridges:
 
-- `createBlockchainBridge`: This function creates a bridge between the current chain and a target chain. It establishes a connection between the two chains, enabling the transfer of assets and transactions.
-- `handleBridgeTransaction`: This function handles a transaction originating from a bridge. It receives and processes bridge transactions within the target chain, ensuring proper execution and synchronization of data.
+- `createBlockchainBridge`: This function establishes a connection between the current chain and a target chain, creating a bridge. It enables the transfer of assets and transactions between the two chains.
+- `handleBridgeTransaction`: This function handles a transaction originating from a bridge within the target chain. It ensures the proper execution and synchronization of data for bridge transactions.
 
-#### Horizontal Shard
+### Horizontal Sharding
 
-In a blockchain network, a shard refers to a subset of the network responsible for processing a portion of the transactions. Horizontal sharding involves dividing the blockchain network into multiple shards, where each shard processes a specific set of transactions. This division enhances scalability by distributing the computational workload across different shards, allowing for parallel transaction processing. Each shard typically maintains its own set of validators or miners responsible for validating and adding new blocks to the shard. Sharding can significantly increase the transaction throughput and overall network capacity of a blockchain system.
+In a blockchain network, sharding involves dividing the network into multiple shards, with each shard responsible for processing a subset of transactions. Horizontal sharding distributes the computational workload across different shards, enhancing scalability and allowing for parallel transaction processing. Each shard typically maintains its own set of validators or miners responsible for validating and adding new blocks to the shard. Sharding significantly increases the transaction throughput and overall network capacity of a blockchain system.
 
-Horizontal sharding involves dividing a blockchain network into multiple shards, with each shard responsible for processing a subset of transactions. The `Chain` class includes functions to manage shards and perform transactions within them:
+The `Chain` class includes functions to manage shards and perform transactions within them:
 
-- `createShard`: This function creates a new shard with the given name. It sets up a separate shard within the chain, allowing specific transactions to be processed independently.
+- `createShard`: This function creates a new shard with the specified name. It sets up a separate shard within the chain, enabling the independent processing of specific transactions.
 - `joinShard`: This function joins the current chain to an existing shard with the given name. It facilitates communication and transaction processing between the main chain and the specified shard.
-- `transferToShard`: This function transfers funds from the main chain to a specific shard. It enables users to move their assets from the main chain to a particular shard, promoting scalability and efficiency.
+- `transferToShard`: This function transfers funds from the main chain to a specific shard. It allows users to move their assets from the main chain to a particular shard, promoting scalability and efficiency.
 - `handleShardTransfer`: This function handles a transfer transaction within a shard. It processes transfers occurring within a shard and updates the respective balances accordingly.
-- `handleShardBridgeTransaction`: This function handles a bridge transaction within a shard. It manages transactions originating from a bridge that involve the shard, ensuring proper execution and data synchronization.
+- `handleShardBridgeTransaction`: This function manages transactions originating from a bridge that involve the shard. It ensures proper execution and data synchronization for bridge transactions within a shard.
 
-#### Swap Function
+### Swap Function
 
-The Chain class includes the `performAtomicSwap` function, which enables atomic swaps between chains. Atomic swaps allow two parties to exchange assets from different chains without the need for a trusted third party. The `performAtomicSwap` function facilitates secure and trustless asset exchanges between chains within the SPHINX network.
+The `Chain` class includes the `performAtomicSwap` function, which enables atomic swaps between chains. Atomic swaps allow two parties to exchange assets from different chains without the need for a trusted third party. The `performAtomicSwap` function facilitates secure and trustless asset exchanges between chains within the SPHINX network.
 
-#### Other Features
+### Other Features
 
-In addition to the above features, the Chain class offers various functionalities to manage blocks, handle transactions, and maintain the chain's state. Some notable features include:
+In addition to the above features, the `Chain` class offers various functionalities to manage blocks, handle transactions, and maintain the chain's state. Some notable features include:
 
-- Block Management: The Chain class provides functions like `addBlock`, `getBlockHash`, `getGenesisBlock`, `getBlockAt`, and `getChainLength` to manage blocks within the chain. These functions allow adding new blocks, retrieving block information, and interacting with the chain's block structure.
+- Block Management: The `Chain` class provides functions like `addBlock`, `getBlockHash`, `getGenesisBlock`, `getBlockAt`, and `getChainLength` to manage blocks within the chain. These functions allow adding new blocks, retrieving block information, and interacting with the chain's block structure.
 - Serialization and Persistence: The `toJson` and `fromJson` functions allow the serialization and deserialization of chain data in JSON format. The `save` and `load` functions enable saving and loading chain data to and from a file, ensuring the persistence of chain information across different sessions.
-- Transaction Handling: The Chain class includes functions like `signTransaction`, `broadcastTransaction`, `updateBalance`, `getBalance`, and `verifyAtomicSwap` to handle various types of transactions within the chain. These functions facilitate transaction signing, broadcasting, balance management, and verification.
+- Transaction Handling: The `Chain` class includes functions like `signTransaction`, `broadcastTransaction`, `updateBalance`, `getBalance`, and `verifyAtomicSwap` to handle various types of transactions within the chain. These functions facilitate transaction signing, broadcasting, balance management, and verification.
 - Visualization: The `visualizeChain` function prints a visualization of the chain, providing a graphical representation of the blocks and their relationships. This feature aids in understanding the structure and state of the chain.
 
 These features collectively contribute to the functionality, scalability, and interoperability of the SPHINX network, enabling bridges between chains, horizontal sharding, atomic swaps, efficient transaction processing, and data management within and between chains.
+
 
 ### Member Function Definitions
 
