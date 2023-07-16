@@ -43,6 +43,14 @@ The `Chain` class includes functions to manage shards and perform transactions w
 
 The `Chain` class includes the `performAtomicSwap` function, which enables atomic swaps between chains. Atomic swaps allow two parties to exchange assets from different chains without the need for a trusted third party. The `performAtomicSwap` function facilitates secure and trustless asset exchanges between chains within the SPHINX network.
 
+### Side Chain
+
+A side chain is an independent blockchain that operates alongside the main blockchain but has its own set of rules and functionalities. It is designed to offload specific types of transactions or execute specific smart contracts that may not be suitable or efficient to handle on the main chain. Side chains allow for scalability and can improve the overall performance of the blockchain network by reducing congestion on the main chain. They enable the execution of specialized operations or the implementation of unique features without affecting the main chain's core consensus mechanism. Side chains are usually connected to the main chain through two-way pegging, which allows assets to be transferred between the side chain and the main chain.
+
+### Bridge
+
+A bridge, in the context of blockchain, is a mechanism that facilitates interoperability and communication between two or more independent blockchain networks. It allows the transfer of assets, data, or transactions between these networks, which may have different protocols, consensus mechanisms, or rules. Bridges establish a connection between blockchain networks, enabling seamless interactions and transfers of value. Bridges can be implemented using various techniques, such as cryptographic proofs, smart contracts, or dedicated protocols. They play a crucial role in enabling cross-chain functionality, allowing assets or data to move between different chains securely and efficiently. Bridges are often used to connect side chains to the main chain, allowing for interoperability and asset transfers between them.
+
 ### Other Features
 
 In addition to the above features, the `Chain` class offers various functionalities to manage blocks, handle transactions, and maintain the chain's state. Some notable features include:
@@ -53,7 +61,6 @@ In addition to the above features, the `Chain` class offers various functionalit
 - Visualization: The `visualizeChain` function prints a visualization of the chain, providing a graphical representation of the blocks and their relationships. This feature aids in understanding the structure and state of the chain.
 
 These features collectively contribute to the functionality, scalability, and interoperability of the SPHINX network, enabling bridges between chains, horizontal sharding, atomic swaps, efficient transaction processing, and data management within and between chains.
-
 
 
 ### Member Function Definitions
