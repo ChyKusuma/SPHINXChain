@@ -14,49 +14,58 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // This code defines a class called Chain that represents a blockchain. The Chain class has various member functions and data members that provide functionality for managing the blockchain and performing operations such as adding blocks, transferring funds, creating bridges, and handling transactions.
 
-// Namespaces: The code starts with using directives for the json namespace from the nlohmann library, and forward declarations for the SPHINXBlock::Block class and SPHINXHash::SPHINX_256 and SPHINXTrx::SPHINXTrx functions.
+// Libraries and Namespaces:
+    // The code includes the nlohmann/json library for working with JSON data.
+    // The code uses the namespaces SPHINXBlock, SPHINXHash, and SPHINXTrx to organize related functions.
 
-// Class Declaration: The Chain class is declared and defined. It contains various member functions and data members that define the behavior and state of the blockchain.
+// SPHINXContract Class:
+    // The SPHINXContract class represents a smart contract that can execute operations on the SPHINX blockchain.
+    // It has member functions such as executeChain, handleBridgeTransaction, handleTransfer, handleShardTransfer, handleShardBridgeTransaction, and handleAtomicSwap.
+    // It also maintains information such as balances, bridge address and secret, and a target chain for atomic swaps.
 
-// Data Members: The Chain class has several private data members:
-    // shards_: A vector of Shard structs representing the shards of the chain.
-    // blocks_: A vector of SPHINXBlock::Block objects representing the blocks of the chain.
-    // publicKey_: A string representing the public key of the chain.
-    // BLOCK_NOT_FOUND: A constant value representing an indicator for a block not found.
-    // shardIndices_: An unordered map that stores the indices of shards by shard name for quick access.
-    // balances_: An unordered map that stores the balances of addresses in the chain.
-    // bridgeAddress_: A string representing the bridge address of the chain.
-    // bridgeSecret_: A string representing the bridge secret of the chain.
-    // targetChain_: An instance of the Chain class representing the target chain.
+// SPHINX_Chain Namespace:
+    // The SPHINX_Chain namespace contains the implementation of the SPHINX blockchain.
+    // It includes the Chain class, which represents a blockchain consisting of blocks.
+    // The Chain class has member functions for adding blocks, retrieving block hashes, handling transactions, creating bridges, transferring funds, and managing shards.
+    // It also includes a Shard struct that represents a shard in the chain.
 
-// Constructor: The Chain class has a default constructor that initializes the blockchain with a genesis block.
+// Chain Class:
+    // The Chain class represents a blockchain consisting of blocks in the SPHINX_Chain namespace.
+    // It has member functions for adding blocks, getting block hashes, transferring funds, handling bridge transactions, converting to/from JSON, saving/loading from a file, and various other blockchain operations.
+    // It also includes functions for managing shards, such as creating shards, joining shards, transferring funds to shards, handling shard transactions, and performing atomic swaps with shards.
+    // The class maintains information such as blocks, balances, bridge address and secret, and a target chain for atomic swaps.
 
-// Member Functions: The Chain class provides various member functions to perform operations on the blockchain. Here are some of the key member functions:
+// Genesis Block:
+    // The Chain class constructor initializes the blockchain with a genesis block, which is the first block in the chain.
 
-    // addBlock: Adds a block to the chain.
-    // getBlockHash: Retrieves the hash of a block at a specific height in the chain.
-    // transferFromSidechain: Transfers blocks from a sidechain to the main chain.
-    // handleBridgeTransaction: Handles a transaction from a bridge to the target chain.
-    // toJson and fromJson: Convert the chain to and from JSON format.
-    // save and load: Save and load the chain data to and from a file.
-    // getGenesisBlock: Retrieves the genesis block of the chain.
-    // getBlockAt: Retrieves a block at a specific index in the chain.
-    // getChainLength: Retrieves the length of the chain.
-    // visualizeChain: Prints a visualization of the chain.
-    // connectToSidechain: Connects to a sidechain.
-    // transferFromSidechain: Transfers funds from a sidechain to the main chain.
-    // createBlockchainBridge: Creates a bridge between the current chain and a target chain.
-    // handleBridgeTransaction: Handles a bridge transaction.
-    // performAtomicSwap: Performs an atomic swap with another chain.
-    // signTransaction and broadcastTransaction: Sign and broadcast a transaction to the network.
-    // updateBalance and getBalance: Update and retrieve the balance of an address.
-    // verifyAtomicSwap: Verifies an atomic swap transaction.
-    // handleTransfer: Handles a transfer transaction.
-    // getBridgeAddress and getBridgeSecret: Retrieves the bridge address and secret of the chain.
+// Block Operations:
+    // The addBlock function adds a block to the chain after verifying its validity using the public key.
+    // The isChainValid function verifies the integrity and validity of the blockchain by checking the hashes, signatures, and blocks' order.
+    // The getBlockHash function retrieves the hash of a block at a given height.
 
-// Sharding chain functionality: The chain also supports sharding functionality with member functions for creating shards, joining shards, transferring funds to shards, handling shard transfers, performing shard atomic swaps, updating shard balances, and getting shard balances.
+// Transaction and Bridge Operations:
+    // The transferFromSidechain function transfers funds from a sidechain to the main chain by adding a block with the specified block hash from the sidechain.
+    // The handleBridgeTransaction function handles a bridge transaction on the chain, validating and adding the transaction to the target chain.
+    // The signTransaction function signs a transaction using the private key.
+    // The broadcastTransaction function broadcasts a transaction via the bridge.
+    // The handleTransfer function updates balances based on a transfer transaction.
+    // The updateBalance function updates the balance of an address on the chain.
 
-// Overall, the Chain class provides a set of functions and data members to manage and interact with a blockchain. It supports basic blockchain operations, transaction handling, bridge creation and transaction handling, atomic swaps, and sharding functionality.
+// JSON Serialization:
+    // The toJson function converts the chain object to a JSON representation.
+    // The fromJson function populates the chain object from a JSON object.
+    // The save function saves the chain to a file in JSON format.
+    // The load function loads a chain from a JSON file.
+
+// Shard Operations:
+    // The createShard function creates a new shard in the chain.
+    // The joinShard function joins an existing shard to the chain.
+    // The transferToShard function transfers funds to a shard on the chain.
+    // The handleShardTransfer function handles a shard transfer transaction on the chain.
+    // The handleShardBridgeTransaction function handles a shard bridge transaction on the chain.
+    // The performShardAtomicSwap function performs an atomic swap with a shard on the chain.
+
+// This code provides the basic functionality of a blockchain and supports operations such as adding blocks, transferring funds, handling transactions, creating bridges, and managing shards.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
