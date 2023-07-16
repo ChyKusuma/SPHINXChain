@@ -8,7 +8,7 @@ This repository contains code for the SPHINXChain project, which is a `Chain` mo
 
 ## Components
 
-# Namespace Declarations
+### Namespace Declarations
 
 The code begins with several namespace declarations:
 
@@ -16,7 +16,7 @@ The code begins with several namespace declarations:
 - The `SPHINXHash` namespace contains the `SPHINX_256` function.
 - The `SPHINXTrx` namespace contains the `SPHINXTrx` function.
 
-## Class Declaration: Chain
+### Class Declaration: Chain
 
 The `Chain` class represents a chain in the SPHINX network. It provides the following member functions:
 
