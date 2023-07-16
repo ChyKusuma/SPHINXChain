@@ -338,9 +338,9 @@ public:
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Bridge: In blockchain systems, a bridge is a mechanism that allows the transfer of assets or data between 
-    // two separate blockchains or networks. It acts as a connection point between different chains, 
-    // facilitating the transfer of information or value. Bridges can be established to enable 
+    // Bridge: In blockchain systems, a bridge is a mechanism that allows the transfer of assets or data
+    // between two separate blockchains or networks. It acts as a connection point between different 
+    // chains, facilitating the transfer of information or value. Bridges can be established to enable 
     // interoperability and interaction between chains that operate on different protocols or have 
     // different functionalities. They typically have their own addresses and secret keys for secure 
     // communication.
