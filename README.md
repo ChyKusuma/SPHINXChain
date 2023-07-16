@@ -1,4 +1,4 @@
-# SPHINXBlock
+# SPHINXChain
 
 ## Introduction
 
