@@ -309,6 +309,13 @@ public:
         return blocks_[blockHeight].getBlockHash();  // Get the hash of the block at the given height
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Sidechain: in blockchain systems is an independent blockchain that runs in parallel with the main 
+    // blockchain, connected through a two-way peg. Sidechains are often created to provide additional 
+    // functionalities or scalability solutions while maintaining interoperability with the main chain.
+    // They allow for the transfer of assets between the main chain and the sidechain, enabling 
+    // specialized applications or experiments without affecting the main chain's performance and security.
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
     void Chain::transferFromSidechain(const SPHINX_Chain::Chain& sidechain, const std::string& blockHash) {
         uint32_t blockHeight = BLOCK_NOT_FOUND;  // Initialize the block height variable
         for (uint32_t i = 0; i < sidechain.getChainLength(); ++i) {  // Iterate over the blocks in the sidechain
@@ -330,6 +337,14 @@ public:
         }
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Bridge: In blockchain systems, a bridge is a mechanism that allows the transfer of assets or data between 
+    // two separate blockchains or networks. It acts as a connection point between different chains, 
+    // facilitating the transfer of information or value. Bridges can be established to enable 
+    // interoperability and interaction between chains that operate on different protocols or have 
+    // different functionalities. They typically have their own addresses and secret keys for secure 
+    // communication.
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
     void Chain::handleBridgeTransaction(const std::string& bridge, const std::string& targetChain, const std::string& transaction) {
         if (bridge == "SPHINX") {  // Check if the bridge is "SPHINX"
             bool isValid = SPHINXVerify::validateTransaction(transaction);  // Validate the transaction
@@ -551,7 +566,14 @@ public:
         return bridgeSecret_;
     }
 
-    // Sharding chain functionality
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Shards: In blockchain systems, shards are smaller, independent chains that operate in parallel to 
+    // the main blockchain. Sharding is a technique used to improve scalability by dividing the workload
+    // across multiple chains, allowing for higher transaction throughput. Each shard typically contains
+    // a subset of accounts or transactions, reducing the computational load and increasing overall 
+    // network capacity.
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
     void Chain::createShard(const std::string& shardName) {
         Shard shard;
         shard.bridgeAddress = shardName;
