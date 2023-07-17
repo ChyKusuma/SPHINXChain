@@ -107,25 +107,22 @@ namespace SPHINXTrx {
     std::string SPHINXTrx(const std::string& message);
 }
 
+namespace SPHINX_Chain {
+    class Chain;  // Forward declaration of the Chain class
+}
+
+namespace SPHINXTrx {
+    class Transaction;  // Forward declaration of the Transaction class
+}
+
 class SPHINXContract {
 public:
-    // Executes the given chain
-    void executeChain(SPHINX_Chain::Chain& chain);
-
-    // Handles a bridge transaction on the chain
-    void handleBridgeTransaction(SPHINX_Chain::Chain& chain, const std::string& bridge, const std::string& targetChain, const std::string& transaction);
-
-    // Handles a transfer transaction on the chain
-    void handleTransfer(SPHINX_Chain::Chain& chain, const SPHINXTrx::Transaction& transaction);
-
-    // Handles a shard transfer transaction on the chain
-    void handleShardTransfer(SPHINX_Chain::Chain& chain, const std::string& shardName, const SPHINXTrx::Transaction& transaction);
-
-    // Handles a shard bridge transaction on the chain
-    void handleShardBridgeTransaction(SPHINX_Chain::Chain& chain, const std::string& shardName, const std::string& bridgeAddress, const std::string& recipientAddress, double amount);
-
-    // Handles an atomic swap between chains
-    void handleAtomicSwap(SPHINX_Chain::Chain& chain, const SPHINX_Chain::Chain& targetChain, const std::string& senderAddress, const std::string& receiverAddress, double amount);
+    void executeChain(SPHINX_Chain::Chain& chain);  // Function declaration
+    void handleBridgeTransaction(SPHINX_Chain::Chain& chain, const std::string& bridge, const std::string& targetChain, const std::string& transaction);  // Function declaration
+    void handleTransfer(SPHINX_Chain::Chain& chain, const SPHINXTrx::Transaction& transaction);  // Function declaration
+    void handleShardTransfer(SPHINX_Chain::Chain& chain, const std::string& shardName, const SPHINXTrx::Transaction& transaction);  // Function declaration
+    void handleShardBridgeTransaction(SPHINX_Chain::Chain& chain, const std::string& shardName, const std::string& bridgeAddress, const std::string& recipientAddress, double amount);  // Function declaration
+    void handleAtomicSwap(SPHINX_Chain::Chain& chain, const SPHINX_Chain::Chain& targetChain, const std::string& senderAddress, const std::string& receiverAddress, double amount);  // Function declaration
 
 private:
     std::unordered_map<std::string, double> balances_;  // Balances of addresses on the chain
