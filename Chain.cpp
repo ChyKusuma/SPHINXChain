@@ -241,6 +241,26 @@ public:
 
         friend class SPHINXContract;
 
+        // Validates the integrity of the blockchain
+        bool isChainValid() const {
+            for (size_t i = 1; i < blocks_.size(); ++i) {
+                const SPHINXBlock::Block& currentBlock = blocks_[i];
+                const SPHINXBlock::Block& previousBlock = blocks_[i - 1];
+
+                // Verify the block's hash and previous block hash
+                if (currentBlock.getBlockHash() != currentBlock.calculateBlockHash() ||
+                    currentBlock.getPreviousHash() != previousBlock.calculateBlockHash()) {
+                    return false;
+                }
+
+                // Verify the signature of the block
+                if (!SPHINXVerify::verifySPHINXBlock(currentBlock, currentBlock.getSignature(), publicKey_)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
     private:
         // Represents a shard in the chain
         struct Shard {
@@ -280,26 +300,6 @@ public:
                 throw std::runtime_error("Invalid block! Block verification failed.");  // Throw an error if the block verification fails
             }
         }
-    }
-
-    bool isChainValid() const {
-        // Validate the integrity of the blockchain
-        for (size_t i = 1; i < blocks_.size(); ++i) {
-            const SPHINXBlock& currentBlock = blocks_[i];
-            const SPHINXBlock& previousBlock = blocks_[i - 1];
-
-            // Verify the block's hash and previous block hash
-            if (currentBlock.getBlockHash() != currentBlock.calculateBlockHash() ||
-                currentBlock.getPreviousHash() != previousBlock.calculateBlockHash()) {
-                return false;
-            }
-
-            // Verify the signature of the block
-            if (!SPHINXVerify::verifySPHINXBlock(currentBlock, currentBlock.getSignature(), publicKey_)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     std::string Chain::getBlockHash(uint32_t blockHeight) const {
