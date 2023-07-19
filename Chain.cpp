@@ -23,14 +23,14 @@
     // It has member functions such as executeChain, handleBridgeTransaction, handleTransfer, handleShardTransfer, handleShardBridgeTransaction, and handleAtomicSwap.
     // It also maintains information such as balances, bridge address and secret, and a target chain for atomic swaps.
 
-// SPHINX_Chain Namespace:
-    // The SPHINX_Chain namespace contains the implementation of the SPHINX blockchain.
+// SPHINXChain Namespace:
+    // The SPHINXChain namespace contains the implementation of the SPHINX blockchain.
     // It includes the Chain class, which represents a blockchain consisting of blocks.
     // The Chain class has member functions for adding blocks, retrieving block hashes, handling transactions, creating bridges, transferring funds, and managing shards.
     // It also includes a Shard struct that represents a shard in the chain.
 
 // Chain Class:
-    // The Chain class represents a blockchain consisting of blocks in the SPHINX_Chain namespace.
+    // The Chain class represents a blockchain consisting of blocks in the SPHINXChain namespace.
     // It has member functions for adding blocks, getting block hashes, transferring funds, handling bridge transactions, converting to/from JSON, saving/loading from a file, and various other blockchain operations.
     // It also includes functions for managing shards, such as creating shards, joining shards, transferring funds to shards, handling shard transactions, and performing atomic swaps with shards.
     // The class maintains information such as blocks, balances, bridge address and secret, and a target chain for atomic swaps.
@@ -89,7 +89,7 @@
 #include "Sign.hpp"
 #include "Key.hpp"
 #include "Verify.hpp"
-#include "Trx.hpp"
+#include "Transaction.hpp"
 
 
 using json = nlohmann::json;
@@ -107,7 +107,7 @@ namespace SPHINXTrx {
     std::string SPHINXTrx(const std::string& message);
 }
 
-namespace SPHINX_Chain {
+namespace SPHINXChain {
     class Chain;  // Forward declaration of the Chain class
 }
 
@@ -117,21 +117,21 @@ namespace SPHINXTrx {
 
 class SPHINXContract {
 public:
-    void executeChain(SPHINX_Chain::Chain& chain);  // Function declaration
-    void handleBridgeTransaction(SPHINX_Chain::Chain& chain, const std::string& bridge, const std::string& targetChain, const std::string& transaction);  // Function declaration
-    void handleTransfer(SPHINX_Chain::Chain& chain, const SPHINXTrx::Transaction& transaction);  // Function declaration
-    void handleShardTransfer(SPHINX_Chain::Chain& chain, const std::string& shardName, const SPHINXTrx::Transaction& transaction);  // Function declaration
-    void handleShardBridgeTransaction(SPHINX_Chain::Chain& chain, const std::string& shardName, const std::string& bridgeAddress, const std::string& recipientAddress, double amount);  // Function declaration
-    void handleAtomicSwap(SPHINX_Chain::Chain& chain, const SPHINX_Chain::Chain& targetChain, const std::string& senderAddress, const std::string& receiverAddress, double amount);  // Function declaration
+    void executeChain(SPHINXChain::Chain& chain);  // Function declaration
+    void handleBridgeTransaction(SPHINXChain::Chain& chain, const std::string& bridge, const std::string& targetChain, const std::string& transaction);  // Function declaration
+    void handleTransfer(SPHINXChain::Chain& chain, const SPHINXTrx::Transaction& transaction);  // Function declaration
+    void handleShardTransfer(SPHINXChain::Chain& chain, const std::string& shardName, const SPHINXTrx::Transaction& transaction);  // Function declaration
+    void handleShardBridgeTransaction(SPHINXChain::Chain& chain, const std::string& shardName, const std::string& bridgeAddress, const std::string& recipientAddress, double amount);  // Function declaration
+    void handleAtomicSwap(SPHINXChain::Chain& chain, const SPHINXChain::Chain& targetChain, const std::string& senderAddress, const std::string& receiverAddress, double amount);  // Function declaration
 
 private:
     std::unordered_map<std::string, double> balances_;  // Balances of addresses on the chain
     std::string bridgeAddress_;  // Address of the bridge
     std::string bridgeSecret_;  // Secret key for the bridge
-    SPHINX_Chain::Chain targetChain_;  // Target chain for atomic swaps
+    SPHINXChain::Chain targetChain_;  // Target chain for atomic swaps
 };
 
-class SPHINX_Chain {
+class SPHINXChain {
 public:
     class Chain {
     public:
@@ -144,7 +144,7 @@ public:
         std::string getBlockHash(uint32_t blockHeight) const;
 
         // Transfers funds from a sidechain to the chain
-        void transferFromSidechain(const SPHINX_Chain::Chain& sidechain, const std::string& blockHash);
+        void transferFromSidechain(const SPHINXChain::Chain& sidechain, const std::string& blockHash);
 
         // Handles a bridge transaction on the chain
         void handleBridgeTransaction(const std::string& bridge, const std::string& targetChain, const std::string& transaction);
@@ -276,7 +276,7 @@ public:
         std::unordered_map<std::string, double> balances_;  // Balances of addresses on the chain
         std::string bridgeAddress_;  // Address of the bridge
         std::string bridgeSecret_;  // Secret key for the bridge
-        SPHINX_Chain::Chain targetChain_;  // Target chain for atomic swaps
+        SPHINXChain::Chain targetChain_;  // Target chain for atomic swaps
     };
 
 
@@ -313,7 +313,7 @@ public:
     // They allow for the transfer of assets between the main chain and the sidechain, enabling 
     // specialized applications or experiments without affecting the main chain's performance and security.
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    void Chain::transferFromSidechain(const SPHINX_Chain::Chain& sidechain, const std::string& blockHash) {
+    void Chain::transferFromSidechain(const SPHINXChain::Chain& sidechain, const std::string& blockHash) {
         uint32_t blockHeight = BLOCK_NOT_FOUND;  // Initialize the block height variable
         for (uint32_t i = 0; i < sidechain.getChainLength(); ++i) {  // Iterate over the blocks in the sidechain
             if (sidechain.getBlockHash(i) == blockHash) {  // Check if the block hash matches the given block hash
@@ -707,4 +707,4 @@ public:
         }
         return 0.0;  // Return 0.0 if the address balance is not found in the shard
     }
-} // namespace SPHINX_Chain
+} // namespace SPHINXChain
