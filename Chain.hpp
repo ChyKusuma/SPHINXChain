@@ -37,7 +37,7 @@
 
 using json = nlohmann::json;
 
-namespace SPHINX_Chain {
+namespace SPHINXChain {
 
     class Chain {
     public:
@@ -49,7 +49,7 @@ namespace SPHINX_Chain {
 
         std::string getBlockHash(uint32_t blockHeight) const;
 
-        void transferFromSidechain(const SPHINX_Chain::Chain& sidechain, const std::string& blockHash);
+        void transferFromSidechain(const SPHINXChain::Chain& sidechain, const std::string& blockHash);
 
         void handleBridgeTransaction(const std::string& bridge, const std::string& targetChain, const std::string& transaction);
 
@@ -147,7 +147,7 @@ namespace SPHINX_Chain {
         std::string blockHash = block.calculateBlockHash();
 
         // Sign the block's hash using the private key
-        std::string signature = SPHINXSign::sign(blockHash, privateKey_);
+        std::string signature = SPHINXVerify::sign_data(std::vector<uint8_t>(transactionData.begin(), transactionData.end()), privateKey);
 
         // Add the block and its signature to the chain
         blocks_.emplace_back(block, signature);
@@ -230,6 +230,6 @@ namespace SPHINX_Chain {
     public:
         static std::vector<Chain> shardBlockchain(const Chain& chain, size_t shardCount);
     };
-} // namespace SPHINX_Chain
+} // namespace SPHINXChain
 
-#endif // SPHINX_CHAIN_HPP
+#endif // SPHINXCHAIN_HPP
