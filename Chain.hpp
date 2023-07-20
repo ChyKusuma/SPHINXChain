@@ -12,8 +12,8 @@
 
 
 
-#ifndef CHAIN_HPP
-#define CHAIN_HPP
+#ifndef SPHINXCHAIN_HPP
+#define SPHINXCHAIN_HPP
 
 #pragma once
 
