@@ -24,6 +24,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "Params.hpp"
 
 
 using json = nlohmann::json;
@@ -32,7 +33,7 @@ class SPHINXChain {
 public:
     class Chain {
     public:
-        explicit Chain(const MainParams& mainParams);
+        explicit Chain(const SPHINXParams::MainParams& mainParams); // Use the correct namespace for MainParams
 
         void addBlock(const SPHINXBlock::Block& block);
 
@@ -119,12 +120,13 @@ public:
         std::string bridgeAddress_;
         std::string bridgeSecret_;
         SPHINXChain::Chain targetChain_;
+
+        SPHINXParams::MainParams mainParams_; // Use the correct namespace for MainParams
     };
 
-    Chain::Chain() {
+     Chain::Chain(const SPHINXParams::MainParams& mainParams) : mainParams_(mainParams) {
         // Create the genesis block with the provided message
-        std::string genesisMessage = "Welcome to Post-Quantum era, The Beginning of a Secured-Trustless Network will start from here - SPHINX Network";
-        SPHINXBlock::Block genesisBlock(genesisMessage);
+        SPHINXBlock::Block genesisBlock(mainParams_.genesisMessage);
 
         // Add the genesis block to the chain
         blocks_.push_back(genesisBlock);
@@ -135,7 +137,7 @@ public:
         // Calculate the hash of the block's data
         std::string blockHash = block.calculateBlockHash();
 
-        // Sign the block's hash using the private key
+        // Sign the block's hash using the private key (Note: you need to define privateKey and transactionData somewhere)
         std::string signature = SPHINXVerify::sign_data(std::vector<uint8_t>(transactionData.begin(), transactionData.end()), privateKey);
 
         // Add the block and its signature to the chain
