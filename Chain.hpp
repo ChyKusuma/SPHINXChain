@@ -17,15 +17,22 @@
 
 #pragma once
 
-
 #include <stdexcept>
 #include <fstream>
 #include <array>
 #include <iostream>
 #include <string>
 #include <vector>
-#include "Params.hpp"
 
+#include "Params.hpp"
+#include "json.hpp"
+#include "Block.hpp"
+#include "Verify.hpp"
+#include "Sign.hpp"
+#include "Key.hpp"
+#include "Verify.hpp"
+#include "Transaction.hpp"
+#include "Consensus/Contract.hpp"
 
 using json = nlohmann::json;
 
