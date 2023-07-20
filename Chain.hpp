@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "Contract.hpp"
+#include "Consensus/Contract.hpp""
 #include "Chain.hpp"
 #include "json.hpp"
 #include "Block.hpp"
@@ -37,15 +37,13 @@
 
 using json = nlohmann::json;
 
-namespace SPHINXChain {
-
+class SPHINXChain {
+public:
     class Chain {
     public:
-        Chain();
+        explicit Chain(const MainParams& mainParams);
 
         void addBlock(const SPHINXBlock::Block& block);
-
-        bool isChainValid() const;
 
         std::string getBlockHash(uint32_t blockHeight) const;
 
@@ -53,11 +51,11 @@ namespace SPHINXChain {
 
         void handleBridgeTransaction(const std::string& bridge, const std::string& targetChain, const std::string& transaction);
 
-        json toJson() const;
+        nlohmann::json toJson() const;
 
-        void fromJson(const json& chainJson);
+        void fromJson(const nlohmann::json& chainJson);
 
-        bool save(const json& chainJson, const std::string& filename) const;
+        bool save(const nlohmann::json& chainJson, const std::string& filename) const;
 
         static Chain load(const std::string& filename);
 
@@ -111,6 +109,8 @@ namespace SPHINXChain {
 
         double getShardBalance(const std::string& shardName, const std::string& address) const;
 
+        bool isChainValid() const;
+
     private:
         struct Shard {
             Chain chain;
@@ -121,15 +121,13 @@ namespace SPHINXChain {
 
         std::vector<Shard> shards_;
         std::vector<SPHINXBlock::Block> blocks_;
-        std::string privateKey_;
-        std::string publicKey_;
+        SPHINXKey::vector SPHINXKeyPub;
         static constexpr uint32_t BLOCK_NOT_FOUND = std::numeric_limits<uint32_t>::max();
         std::unordered_map<std::string, uint32_t> shardIndices_;
-
         std::unordered_map<std::string, double> balances_;
         std::string bridgeAddress_;
         std::string bridgeSecret_;
-        Chain targetChain_;
+        SPHINXChain::Chain targetChain_;
     };
 
     Chain::Chain() {
