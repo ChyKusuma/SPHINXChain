@@ -25,15 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "Consensus/Contract.hpp""
-#include "Chain.hpp"
-#include "json.hpp"
-#include "Block.hpp"
-#include "Verify.hpp"
-#include "Sign.hpp"
-#include "Key.hpp"
-#include "Verify.hpp"
-
 
 using json = nlohmann::json;
 
